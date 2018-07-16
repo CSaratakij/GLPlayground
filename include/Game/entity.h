@@ -1,6 +1,6 @@
 
-#ifndef ECS_H
-#define ECS_H
+#ifndef ENTITY_H
+#define ENTITY_H
 
 #include <stdio.h>
 #include <stdbool.h>
