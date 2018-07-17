@@ -1,6 +1,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 #include <cstdio>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -11,11 +12,8 @@ bool SetupGL();
 void RenderCommand();
 void UICommand(GLFWwindow *window);
 
-float verticies[] = {
-    0.0f, 0.5f, 0.0f,
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f
-};
+int vertextOffsetLocation;
+int vertextColorLocation;
 
 unsigned int VBO;
 unsigned int VAO;
@@ -23,7 +21,15 @@ unsigned int vertexShader;
 unsigned int fragementShader;
 unsigned int shaderProgram;
 
-bool isShowDemoMenu = true;
+float verticies[] = {
+    0.0f, 0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f
+};
+
+glm::vec4 clearColor = { 0.2f, 0.3f, 0.3f, 1.0f };
+glm::vec2 vertexOffset = { 0.0f, 0.0f };
+glm::vec4 vertextColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 int main()
 {
@@ -56,6 +62,8 @@ int main()
 
         glfwSwapBuffers(window);
     }
+
+    glDeleteProgram(shaderProgram);
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -101,16 +109,18 @@ bool SetupGL()
     int linkSuccess = 0;
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linkSuccess);
 
-    if (linkSuccess) {
+    if (!linkSuccess) {
+        fprintf(stderr, "Can't link shader..\n");
+
         glDeleteShader(vertexShader);
         glDeleteShader(fragementShader);
-    }
-    else {
-        fprintf(stderr, "Can't link shader..\n");
+
         return false;
     }
 
-    glUseProgram(shaderProgram);
+    glDetachShader(shaderProgram, vertexShader);
+    glDetachShader(shaderProgram, fragementShader);
+
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     return true;
@@ -118,22 +128,42 @@ bool SetupGL()
 
 void RenderCommand()
 {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shaderProgram);
+
+    vertextOffsetLocation = glGetUniformLocation(shaderProgram, "offset");
+    vertextColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+
+    glUniform2f(vertextOffsetLocation, vertexOffset.x, vertexOffset.y);
+    glUniform4f(vertextColorLocation, vertextColor.x, vertextColor.y, vertextColor.z, vertextColor.w);
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void UICommand(GLFWwindow *window)
 {
     {
-        ImGui::Text("Hi");
+        ImGui::Text("Color : ");
+        ImGui::ColorEdit4("Background", (float*)&clearColor);
+        ImGui::ColorEdit4("Vertext", (float*)&vertextColor);
+
+        ImGui::Spacing();
+
+        ImGui::Text("Position : (%.2f, %.2f)", vertexOffset.x, vertexOffset.y);
+        ImGui::SliderFloat("Offset X", &vertexOffset.x, -1.0f, 1.0f, "");
+        ImGui::SliderFloat("Offset Y", &vertexOffset.y, -1.0f, 1.0f, "");
+
+        if (ImGui::Button("Reset")) {
+            vertexOffset = { 0.0f, 0.0f };
+        }
+
+        ImGui::Spacing();
+
         if (ImGui::Button("Close app")) {
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
-    }
-
-    if (isShowDemoMenu) {
-        ImGui::ShowDemoWindow(&isShowDemoMenu);
     }
 }
 
