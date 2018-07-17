@@ -2,7 +2,8 @@
 #include "playground/playground.h"
 
 bool SetupGL();
-void Render();
+void RenderCommand();
+void UICommand(GLFWwindow *window);
 
 float verticies[] = {
     0.0f, 0.5f, 0.0f,
@@ -15,6 +16,8 @@ unsigned int VAO;
 unsigned int vertexShader;
 unsigned int fragementShader;
 unsigned int shaderProgram;
+
+bool isShowDemoMenu = true;
 
 int main()
 {
@@ -30,13 +33,31 @@ int main()
         return -1;
     }
 
+    SetupUI(window);
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        Render();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        UICommand(window);
+
+        ImGui::Render();
+        RenderCommand();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
     glfwTerminate();
+
     return 0;
 }
 
@@ -89,10 +110,24 @@ bool SetupGL()
     return true;
 }
 
-void Render()
+void RenderCommand()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void UICommand(GLFWwindow *window)
+{
+    {
+        ImGui::Text("Hi");
+        if (ImGui::Button("Close app")) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+    }
+
+    if (isShowDemoMenu) {
+        ImGui::ShowDemoWindow(&isShowDemoMenu);
+    }
 }
 

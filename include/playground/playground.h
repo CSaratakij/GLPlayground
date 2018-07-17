@@ -8,5 +8,6 @@
 #include "resource.h"
 #include "shader.h"
 #include "window.h"
+#include "ui.h"
 
 #endif

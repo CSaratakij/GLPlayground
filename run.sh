@@ -3,7 +3,7 @@
 
 CC="g++"
 COMPILER_FLAGS="-Wall"
-SOURCES="./src/*.c"
+SOURCES="./src/*.c ./src/*.cpp"
 LIBS="-lGL -ldl"
 PROGRAM_NAME="gl"
 
