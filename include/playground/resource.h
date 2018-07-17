@@ -22,7 +22,7 @@ char* LoadFile(char* path)
 
     rewind(file);
 
-    fileContent = malloc(fileSize * (sizeof(char)));
+    fileContent = (char*) malloc(fileSize * (sizeof(char)));
     fread(fileContent, sizeof(char), fileSize, file);
 
     fclose(file);

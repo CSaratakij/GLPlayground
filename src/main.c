@@ -54,12 +54,12 @@ bool SetupGL()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    if (!CompileShader("./src/shader/simple.vert", GL_VERTEX_SHADER, &vertexShader)) {
+    if (!CompileShader((char*)"./src/shader/simple.vert", GL_VERTEX_SHADER, &vertexShader)) {
         fprintf(stderr, "Error, Can't compile vertex shader..\n");
         return false;
     }
 
-    if (!CompileShader("./src/shader/simple.frag", GL_FRAGMENT_SHADER, &fragementShader)) {
+    if (!CompileShader((char*)"./src/shader/simple.frag", GL_FRAGMENT_SHADER, &fragementShader)) {
         fprintf(stderr, "Error, Can't compile fragement shader..\n");
         return false;
     }

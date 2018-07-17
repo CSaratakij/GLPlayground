@@ -1,7 +1,7 @@
 
 #!/bin/sh
 
-CC="gcc"
+CC="g++"
 COMPILER_FLAGS="-Wall"
 SOURCES="./src/*.c"
 LIBS="-lGL -ldl"
