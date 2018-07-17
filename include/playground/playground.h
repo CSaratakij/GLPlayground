@@ -7,5 +7,6 @@
 #include <stdbool.h>
 #include "resource.h"
 #include "shader.h"
+#include "window.h"
 
 #endif
