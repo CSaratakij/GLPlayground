@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "playground/resource.h"
 
 char* LoadFile(char* path)
 {
