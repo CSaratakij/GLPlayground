@@ -1,28 +1,15 @@
 
-#include "Game/game.h"
+#include "playground/playground.h"
 
+#define WINDOW_TITLE "GLPlayground"
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 #define UPDATE_RATE (1 / 60)
 
 static void ErrorCallback(int error, const char* description);
 static void Framebuffer_Size_Callback(GLFWwindow* window, int width, int height);
 
-void InitGame(struct World *world);
-void Update(float delta);
-void Render(struct World *world, GLFWwindow *window);
-
-/* --- OpenGL Data --- */
-unsigned int shaderProgram;
-
-float verticies[] = {
-    0.0f, 0.5f, 0.0f,
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f
-};
-
-/* --- Game Data --- */
-struct World world;
-Entity player;
-
+void Render(GLFWwindow *window);
 
 int main()
 {
@@ -37,7 +24,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(1280, 720, "OpenGL Playground", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
 
     if (!window) {
         glfwTerminate();
@@ -53,13 +40,20 @@ int main()
     glfwSwapInterval(1);
     glfwSetFramebufferSizeCallback(window, Framebuffer_Size_Callback);
 
-    /* --- Load Resource --- */
+    float verticies[] = {
+        0.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f
+    };
+
     unsigned int VBO;
+
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
 
     unsigned int VAO;
+
     glGenVertexArrays(1, &VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindVertexArray(VAO);
@@ -82,10 +76,11 @@ int main()
         return -1;
     }
 
-    shaderProgram = glCreateProgram();
+    unsigned int shaderProgram = glCreateProgram();
 
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragementShader);
+
     glLinkProgram(shaderProgram);
 
     int linkSuccess = 0;
@@ -100,14 +95,12 @@ int main()
         return -1;
     }
 
-    glViewport(0, 0, 1280, 720);
-    InitGame(&world);
+    glUseProgram(shaderProgram);
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        InputSystem(&world, window);
-        Update(0.1f);
-        Render(&world, window);
+        Render(window);
     }
 
     glfwTerminate();
@@ -124,28 +117,11 @@ static void Framebuffer_Size_Callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void InitGame(struct World *world)
-{
-    InitWorld(world);
-    if (CreatePlayer(world, &player)) {
-        printf("Can create player at id : %d\n", player);
-    }
-}
-
-void Update(float delta)
-{
-    MovementSystem(&world, delta);
-}
-
-void Render(struct World *world, GLFWwindow *window)
+void Render(GLFWwindow *window)
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(shaderProgram);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    RenderSystem(world);
     glfwSwapBuffers(window);
 }
 
