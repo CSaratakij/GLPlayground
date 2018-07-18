@@ -3,7 +3,8 @@
 - My OpenGL Playground.
 
 # Dependencies
-- glfw
 - glad
-- opengl3
+- glfw
+- glm
 - imgui
+- opengl3
