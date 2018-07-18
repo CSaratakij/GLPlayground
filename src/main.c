@@ -8,12 +8,21 @@
 #include "imgui_impl_opengl3.h"
 #include "playground/playground.h"
 
+#define VERTEX_SHADER_SOURCE_PATH "./src/shader/simple.vert"
+#define FRAGEMENT_SHADER_SOURCE_PATH "./src/shader/simple.frag"
+
 bool SetupGL();
 void RenderCommand();
 void UICommand(GLFWwindow *window);
 
+void DrawDebugUI(GLFWwindow *window);
+void DrawTextWindow();
+
 char *openglVersion;
 char *glslVersion;
+
+char *vertexSourceFile;
+char *fragementSourceFile;
 
 int vertextOffsetLocation;
 int vertextColorLocation;
@@ -55,6 +64,9 @@ int main()
 
     SetupUI(window);
 
+    vertexSourceFile = LoadFile((char*)VERTEX_SHADER_SOURCE_PATH);
+    fragementSourceFile = LoadFile((char*)FRAGEMENT_SHADER_SOURCE_PATH);
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
@@ -80,6 +92,9 @@ int main()
     glfwDestroyWindow(window);
     glfwTerminate();
 
+    free(vertexSourceFile);
+    free(fragementSourceFile);
+
     return 0;
 }
 
@@ -100,12 +115,12 @@ bool SetupGL()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    if (!CompileShader((char*)"./src/shader/simple.vert", GL_VERTEX_SHADER, &vertexShader)) {
+    if (!CompileShader((char*)VERTEX_SHADER_SOURCE_PATH, GL_VERTEX_SHADER, &vertexShader)) {
         fprintf(stderr, "Error, Can't compile vertex shader..\n");
         return false;
     }
 
-    if (!CompileShader((char*)"./src/shader/simple.frag", GL_FRAGMENT_SHADER, &fragementShader)) {
+    if (!CompileShader((char*)FRAGEMENT_SHADER_SOURCE_PATH, GL_FRAGMENT_SHADER, &fragementShader)) {
         fprintf(stderr, "Error, Can't compile fragement shader..\n");
         return false;
     }
@@ -154,6 +169,12 @@ void RenderCommand()
 
 void UICommand(GLFWwindow *window)
 {
+    DrawDebugUI(window);
+    DrawTextWindow();
+}
+
+void DrawDebugUI(GLFWwindow *window)
+{
     {
         ImGui::Text("OpenGL : ");
         ImGui::BulletText("Version : %s", openglVersion);
@@ -169,7 +190,7 @@ void UICommand(GLFWwindow *window)
 
         ImGui::Text("Color : ");
         ImGui::ColorEdit4("Background", (float*)&clearColor);
-        ImGui::ColorEdit4("Vertext", (float*)&vertextColor);
+        ImGui::ColorEdit4("Vertex", (float*)&vertextColor);
 
         if (ImGui::Button("Reset##1")) {
             clearColor = defaultClearColor;
@@ -200,5 +221,16 @@ void UICommand(GLFWwindow *window)
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
     }
+}
+
+void DrawTextWindow()
+{
+    ImGui::Begin("Vertex Shader", NULL);
+    ImGui::Text(vertexSourceFile);
+    ImGui::End();
+
+    ImGui::Begin("Fragement Shader", NULL);
+    ImGui::Text(fragementSourceFile);
+    ImGui::End();
 }
 
