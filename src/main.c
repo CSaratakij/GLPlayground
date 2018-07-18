@@ -12,6 +12,9 @@ bool SetupGL();
 void RenderCommand();
 void UICommand(GLFWwindow *window);
 
+char *openglVersion;
+char *glslVersion;
+
 int vertextOffsetLocation;
 int vertextColorLocation;
 
@@ -27,9 +30,14 @@ float verticies[] = {
     0.5f, -0.5f, 0.0f
 };
 
-glm::vec4 clearColor = { 0.2f, 0.3f, 0.3f, 1.0f };
 glm::vec2 vertexOffset = { 0.0f, 0.0f };
+glm::vec2 defaultVertexOffset = { 0.0f, 0.0f };
+
+glm::vec4 clearColor = { 0.2f, 0.3f, 0.3f, 1.0f };
+glm::vec4 defaultClearColor = { 0.2f, 0.3f, 0.3f, 1.0f };
+
 glm::vec4 vertextColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+glm::vec4 defaultVertexColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 int main()
 {
@@ -77,6 +85,9 @@ int main()
 
 bool SetupGL()
 {
+    openglVersion = (char*)glGetString(GL_VERSION);
+    glslVersion = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
@@ -122,7 +133,6 @@ bool SetupGL()
     glDetachShader(shaderProgram, fragementShader);
 
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
     return true;
 }
 
@@ -145,23 +155,48 @@ void RenderCommand()
 void UICommand(GLFWwindow *window)
 {
     {
+        ImGui::Text("OpenGL : ");
+        ImGui::BulletText("Version : %s", openglVersion);
+
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::Text("GLSL : ");
+        ImGui::BulletText("Version : %s", glslVersion);
+
+        ImGui::Separator();
+        ImGui::Spacing();
+
         ImGui::Text("Color : ");
         ImGui::ColorEdit4("Background", (float*)&clearColor);
         ImGui::ColorEdit4("Vertext", (float*)&vertextColor);
 
-        ImGui::Spacing();
-
-        ImGui::Text("Position : (%.2f, %.2f)", vertexOffset.x, vertexOffset.y);
-        ImGui::SliderFloat("Offset X", &vertexOffset.x, -1.0f, 1.0f, "");
-        ImGui::SliderFloat("Offset Y", &vertexOffset.y, -1.0f, 1.0f, "");
-
-        if (ImGui::Button("Reset")) {
-            vertexOffset = { 0.0f, 0.0f };
+        if (ImGui::Button("Reset##1")) {
+            clearColor = defaultClearColor;
+            vertextColor = defaultVertexColor;
         }
 
+        ImGui::Separator();
         ImGui::Spacing();
 
-        if (ImGui::Button("Close app")) {
+        ImGui::Text("Offset : (%.2f, %.2f)", vertexOffset.x, vertexOffset.y);
+        ImGui::SliderFloat("X", &vertexOffset.x, -1.0f, 1.0f, "");
+        ImGui::SliderFloat("Y", &vertexOffset.y, -1.0f, 1.0f, "");
+
+        if (ImGui::Button("Reset##2")) {
+            vertexOffset = defaultVertexOffset;
+        }
+
+        ImGui::Separator();
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+
+        if (ImGui::Button("Quit")) {
             glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
     }

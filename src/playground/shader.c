@@ -19,8 +19,8 @@ bool CompileShader(char *path, GLenum type, unsigned int *id)
     shader = glCreateShader(type);
 
     *id = shader;
-    int sourceLength = strlen(source);
 
+    int sourceLength = strlen(source);
     glShaderSource(shader, 1, (const GLchar**)&source, (GLint*)&sourceLength);
 
     printf("Load shader : \n");
