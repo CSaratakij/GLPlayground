@@ -22,7 +22,9 @@ char* LoadFile(char* path)
     fileContent = (char*) malloc(fileSize * (sizeof(char)));
     fread(fileContent, sizeof(char), fileSize, file);
 
+    fileContent[fileSize - 1] = '\0';
     fclose(file);
+
     return fileContent;
 }
 

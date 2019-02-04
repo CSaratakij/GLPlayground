@@ -26,8 +26,8 @@ bool CompileShader(char *path, GLenum type, unsigned int *id)
     printf("Load shader : \n");
     printf("%s", source);
 
-    free(source);
     glCompileShader(shader);
+    free(source);
 
     int success;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
